@@ -1,0 +1,12 @@
+{% extends "encyclopedia/layout.html" %}
+
+{% block title %}
+    Error 404 - Wiki
+{% endblock %}
+
+{% block body %}
+<h1>Error 404</h1>
+    <div>Error: the requested page was not found.</div>
+    <br/>
+    <a class="btn btn-dark" href="{% url 'index' %}" role="button">View Entries</a>
+{% endblock %}
