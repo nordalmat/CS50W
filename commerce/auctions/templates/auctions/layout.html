@@ -1,0 +1,51 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>{% block title %}Auctions{% endblock %}</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+        <link href="{% static 'auctions/styles.css' %}" rel="stylesheet">
+    </head>
+    <body>
+        <h1>Auctions</h1>
+        <div>
+            {% if user.is_authenticated %}
+                Signed in as <strong>{{ user.username }}</strong>.
+            {% else %}
+                Not signed in.
+            {% endif %}
+        </div>
+        <div class="col-md-12">
+            <ul class="nav nav-pills my-3">
+                <li class="nav-item">
+                    <a class="btn btn-primary mx-3" href="{% url 'auctions:index' %}">Active Listings</a>
+                </li>
+                <li class="nav-item">
+                    <a class="btn btn-outline-primary mx-3" href="{% url 'auctions:brands' %}">Brands</a>
+                </li>
+                {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="btn btn-outline-primary mx-3" href="{% url 'auctions:new' %}">New Auction</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-outline-primary mx-3" href="{% url 'auctions:watchlist' %}">Watchlist</a>
+                    </li>
+                    <li class="nav-item ml-auto">
+                        <a class="btn btn-outline-danger mx-3" href="{% url 'auctions:logout' %}">Log Out</a>
+                    </li>
+                {% else %}
+                    <li class="nav-item ml-auto">
+                        <a class="btn btn-outline-primary mx-3" href="{% url 'auctions:login' %}">Log In</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active mx-3" href="{% url 'auctions:register' %}">Register</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+        <hr>
+        {% block body %}
+        {% endblock %}
+    </body>
+</html>

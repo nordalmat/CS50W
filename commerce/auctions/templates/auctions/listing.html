@@ -1,0 +1,172 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    {% if bid_msg %}
+        {% if success %}
+            <div class="alert alert-success" role="alert">
+                {{ bid_msg }}
+            </div>
+        {% else %}
+            <div class="alert alert-danger" role="alert">
+                {{ bid_msg }}
+            </div>
+        {% endif %}
+    {% endif %}
+    {% if closing_msg %}
+        <div class="alert alert-success" role="alert">
+            {{ closing_msg }}
+        </div>
+    {% endif %}
+    {% if not entry.isActive %}
+        {% if user == entry.price.user %}
+            {% if entry.price.user == entry.author %}
+            <div class="alert alert-warning" role="alert">
+                Your item was not sold.
+            </div>
+            {% else %}
+            <div class="alert alert-success" role="alert">
+                Congratulations! You won the auction!
+            </div>
+            {% endif %}
+        {% else %}
+            <div class="alert alert-danger" role="alert">
+                This auction is no longer active. 
+            </div>
+        {% endif %}
+    {% endif %}
+
+
+    <div class='row mx-4'>
+        {% if user.is_authenticated and entry.isActive %}
+            {% if entry_in_watchlist %}
+                <form action="{% url 'auctions:removeWatchlistOnListingPage' id=entry.id %}" method="POST">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Remove From Watchlist</button>
+                </form>
+            {% else %}
+                <form action="{% url 'auctions:addWatchlist' id=entry.id %}" method="POST">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary mx-3">Add to Watchlist</button>
+                </form>
+            {% endif %}
+            {% if isOwner %}
+                <form action="{% url 'auctions:close_listing' id=entry.id %}" method="POST">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger mx-3">Close Listing</button>
+                </form>
+            {% endif %}
+        {% endif %}
+    </div>
+    <br>
+    <div class="row mx-4">
+        <div class="col-md-3">
+            <div class="card mx-auto h-100">
+                <div class="card-body">
+                    <h2 class="card-title">{{ entry.title }}</h2>
+                    <h4 class="card-text"><strong>${{ entry.price.amount }}</strong></h4>
+                    <img class="card-img-bottom mx-auto" id='entry' src="{{ entry.image_url }}" class="card-img-bottom" alt="No Image" style="width: 100%; height: 50vh; object-fit: cover;">
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card mx-auto" style="height: auto;">
+                <div class="card-body">
+                    <h3 class="card-title">Details:</h3>
+                    <p class="card-text">{{ entry.description }}</p>
+                    <p class="card-text">Brand: <a href="{% url 'auctions:brand_entries' id=entry.brand.id %}">{{ entry.brand }}</a></p>
+                    <p class="card-text">Uploaded by <a href="{% url 'auctions:users' id=entry.author.id %}">{{ entry.author }}</a></p>
+                    <p class="card-text">Uploaded on {{ entry.created }}</p>
+                </div>
+            </div>
+            <br>
+            {% if user.is_authenticated and entry.isActive %}
+                <div class="card mx-auto" style="height: auto;">
+                    <div class="card-body">
+                        <h3 class="card-title">Bids:</h3>
+                        <form action="{% url 'auctions:make_bid' id=entry.id %}" method="POST">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <p>Current highest bid is <strong>${{ entry.price.amount }}</strong></p>
+                                <input type="number" name="bid" class="form-control" id="price" min="0" placeholder="Enter bid">
+                            </div>
+                            <button type="submit" class="btn btn-primary">Bid</button>
+                        </form>
+                    </div>
+                </div>
+            {% else %}
+            <div class="card mx-auto" style="height: auto;">
+                <div class="card-body">
+                    <h3 class="card-title">Bids:</h3>
+                    <form action="{% url 'auctions:make_bid' id=entry.id %}" method="POST">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            {% if entry.isActive %}
+                                <p>The current highest bid is <strong>${{ entry.price.amount }}</strong></p>
+                                <input type="number" name="bid" class="form-control" id="price" min="0" placeholder="You must be logged in to make a bid offer..." readonly>
+                            {% else %}
+                                <p>The highest bid was <strong>${{ entry.price.amount }}</strong></p>
+                                <input type="number" name="bid" class="form-control" id="price" min="0" placeholder="The auction is no longer active..." readonly>
+                            {% endif %}
+                        </div>
+                        <button type="submit" class="btn btn-primary" disabled>Bid</button>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+            <br>
+            <div class="row row-cols-6">
+                {% for auction in selection %}
+                    <div class="card mx-auto" style="height: 250px;">
+                        <img src="{{ auction.image_url }}" class="card-img-top" alt="No Image" style="width: 100%; height: 16vh; object-fit: contain;">
+                        <div class="card-body">
+                            <h5 class="card-text">{{ auction.title }}</h5>
+                            <p class="card-text">${{ auction.price.amount }}</p>
+                            <a href="{% url 'auctions:listing' id=auction.id %}" class="stretched-link"></a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <br>
+    <div class="row mx-1">
+        <div class="col md-12">
+            <div class="card-body">
+                <h3 class="card-title">Comments:</h3>
+                {% if user.is_authenticated %}
+                    <form action="{% url 'auctions:add_comment' id=entry.id %}" method="POST">
+                        <textarea class="form-control" name="comment" rows="3" placeholder="Comment"></textarea>
+                        {% csrf_token %}
+                        <br>
+                        <button type="submit" class="btn btn-primary">Post</button>
+                    </form>
+                    <br>
+                {% else %}
+                    <form action="{% url 'auctions:add_comment' id=entry.id %}" method="POST">
+                        <textarea class="form-control" name="comment" rows="3" placeholder="You must be logged in to comment..." readonly></textarea>
+                        {% csrf_token %}
+                        <br>
+                        <button type="submit" class="btn btn-primary" disabled>Post</button>
+                    </form>
+                    <br>
+                {% endif %}
+                {% if msg %}
+                    <h5>{{ msg }}</h5>
+                {% endif %}
+                {% for comment in all_comment %}
+                    <div class="col md-12">
+                        <div class="card mx-auto">
+                            <div class="card-body">
+                                <h5 class="card-title"><a href="#">{{ comment.author }}:</a></h5>
+                                <p class="card-text">{{ comment.content }}</p>
+                                <p class="card-footer">Uploaded on {{ comment.created }}</p>
+                                <hr>
+                            </div>
+                        </div>
+                        <br>
+                    </div>
+                {% endfor %}
+            </div>  
+        </div>
+    </div>
+{% endblock %}

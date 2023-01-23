@@ -1,0 +1,37 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>Active Listings</h2>
+    {% if activate %}
+        <form action="{% url 'auctions:list_filter' %}" method="POST">
+            <div class="form-row">
+                <div class="col-auto">
+                    {% csrf_token %}
+                    <select class="form-control" name="brand" id="brand">
+                        <option value="All brands">All brands</option>
+                        {% for brand in brands %}
+                            <option value="{{ brand }}">{{ brand }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <input class="btn btn-outline-primary mx-3" type="submit" value="Select">
+            </div>
+        </form>
+        <br>
+    {% endif %}
+    {% if msg %}
+        <h5>{{ msg }}</h5>
+    {% endif %}
+    <div class="row row-cols-6">
+        {% for auction in auctions %}
+            <div class="card h-10 position-relative" style="width: 18rem; margin-left: 50px; margin-bottom: 30px;">
+                <img src="{{ auction.image_url }}" class="card-img-top" alt="No Image" style="width: 100%; height: 50vh; object-fit: cover;">
+                <div class="card-body">
+                    <h5 class="card-title mb-2">{{ auction.title }}</h5>
+                    <p class="card-text mb-2">${{ auction.price.amount }}</p>
+                    <a href="{% url 'auctions:listing' id=auction.id %}" class="btn btn-primary mb-2 stretched-link">View</a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
