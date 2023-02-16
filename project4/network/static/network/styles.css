@@ -1,0 +1,15 @@
+.body {
+    margin-left: 20px;
+    margin-right: 20px;
+    margin-top: 20px;
+}
+
+.container-fluid {
+    padding-left: 0px;
+    padding-right: 0px;
+}
+
+.row {
+    padding-left: 15px;
+    padding-right: 15px;
+}

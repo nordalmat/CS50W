@@ -1,0 +1,33 @@
+{% extends "network/layout.html" %}
+{% load static %}
+
+{% block body %}
+
+<div id="all-view">
+    <h3>Following:</h3>
+    {% for post in page_posts %}
+        <div class="card my-3">
+            <div class="card-body">
+                <a id='author' href="{% url 'user_page' username=post.author %}" class="card-text"><strong>@{{ post.author }}</strong></a>
+                <p class="card-text">{{ post.body }}</p>
+                <h6 class="card-subtitle mb-3 text-muted">{{ post.whenpublished }}</h6>
+                <div class="row">
+                    {% if post.id in liked_posts %}
+                        <i id='{{ post.id }}' class="fa-solid fa-heart fa-xl my-3" onclick="likeDislikeButton({{ post.id }}, {{ liked_posts }})""></i>
+                    {% else %}
+                        <i id='{{ post.id }}' class="fa-regular fa-heart fa-xl my-3" onclick='likeDislikeButton({{ post.id }}, {{ liked_posts }})'></i>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+<div id="new-view">
+    <h3>New Post:</h3>
+    <form id="new-form">
+        <textarea class="form-control" id="new-body" placeholder="Text"></textarea>
+        <input type="submit" class="btn btn-primary my-3" value="Post"/>
+    </form>
+</div>
+
+{% endblock %}
